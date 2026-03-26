@@ -110,12 +110,6 @@ class EdgeTTSStateHolder(
         _edgeTtsState.value = PlaybackStatus.STOPPED
     }
 
-    override fun skipNext() {
-        // Stop current playback; user can tap "Read aloud" again to restart
-        ttsManager.stop()
-        _edgeTtsState.value = PlaybackStatus.STOPPED
-    }
-
     override fun setLanguage(lang: LocaleOverride) {
         _edgeLanguage.value = lang
         if (lang is ForcedLocale) {

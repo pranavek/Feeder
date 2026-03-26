@@ -166,7 +166,6 @@ fun ArticleScreen(
         ttsOnPlay = viewModel::ttsPlay,
         ttsOnPause = viewModel::ttsPause,
         ttsOnStop = viewModel::ttsStop,
-        ttsOnSkipNext = viewModel::ttsSkipNext,
         ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
         onToggleBookmark = {
             viewModel.setBookmarked(!viewState.isBookmarked)
@@ -197,7 +196,6 @@ fun ArticleScreen(
     ttsOnPlay: () -> Unit,
     ttsOnPause: () -> Unit,
     ttsOnStop: () -> Unit,
-    ttsOnSkipNext: () -> Unit,
     ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onToggleBookmark: () -> Unit,
     articleScrollState: ScrollState,
@@ -411,7 +409,6 @@ fun ArticleScreen(
                 onPlay = ttsOnPlay,
                 onPause = ttsOnPause,
                 onStop = ttsOnStop,
-                onSkipNext = ttsOnSkipNext,
                 languages = ImmutableHolder(viewState.ttsLanguages),
                 onSelectLanguage = ttsOnSelectLanguage,
             )

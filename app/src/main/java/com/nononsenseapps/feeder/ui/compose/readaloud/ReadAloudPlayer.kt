@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.DropdownMenu
@@ -55,7 +54,6 @@ fun HideableTTSPlayer(
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
-    onSkipNext: () -> Unit,
     languages: ImmutableHolder<List<Locale>>,
     onSelectLanguage: (LocaleOverride) -> Unit,
     modifier: Modifier = Modifier,
@@ -72,7 +70,6 @@ fun HideableTTSPlayer(
             onPlay = onPlay,
             onPause = onPause,
             onStop = onStop,
-            onSkipNext = onSkipNext,
             languages = languages,
             onSelectLanguage = onSelectLanguage,
             floatingActionButton = floatingActionButton,
@@ -87,7 +84,6 @@ fun TTSPlayer(
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
-    onSkipNext: () -> Unit,
     languages: ImmutableHolder<List<Locale>>,
     onSelectLanguage: (LocaleOverride) -> Unit,
     modifier: Modifier = Modifier,
@@ -135,16 +131,6 @@ fun TTSPlayer(
                             )
                         }
                     }
-                }
-            }
-            PlainTooltipBox(tooltip = { Text(stringResource(R.string.skip_to_next)) }) {
-                IconButton(
-                    onClick = onSkipNext,
-                ) {
-                    Icon(
-                        Icons.Default.SkipNext,
-                        contentDescription = stringResource(R.string.skip_to_next),
-                    )
                 }
             }
             Box {
@@ -227,7 +213,6 @@ private fun PlayerPreview() {
             onPlay = {},
             onPause = {},
             onStop = {},
-            onSkipNext = {},
             languages = ImmutableHolder(emptyList()),
             {},
         )
@@ -243,7 +228,6 @@ private fun PlayerPreviewWithFab() {
             onPlay = {},
             onPause = {},
             onStop = {},
-            onSkipNext = {},
             languages = ImmutableHolder(emptyList()),
             {},
             floatingActionButton = {
