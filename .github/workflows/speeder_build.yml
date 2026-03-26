@@ -60,7 +60,7 @@ jobs:
 
       - name: Build release APK
         run: >
-          ./gradlew assembleFdroidRelease --no-daemon
+          ./gradlew assembleFdroidRelease --no-daemon --stacktrace
           -PSTORE_FILE=../shareddebug.keystore
           -PSTORE_PASSWORD=android
           -PKEY_ALIAS=AndroidDebugKey
