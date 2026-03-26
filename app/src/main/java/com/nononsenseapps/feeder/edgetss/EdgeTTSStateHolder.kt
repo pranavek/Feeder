@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.edgetss
 
 import android.content.Context
+import android.os.Build
 import androidx.compose.ui.text.AnnotatedString
 import com.nononsenseapps.feeder.model.AppSetting
 import com.nononsenseapps.feeder.model.ForcedAuto
@@ -72,11 +73,26 @@ class EdgeTTSStateHolder(
         // Select voice based on language preference
         val langOverride = _edgeLanguage.value
         ttsManager.voice = when {
+            // User explicitly chose a locale — always respect it
             langOverride is ForcedLocale -> voiceForLocale(langOverride.locale)
+
             useDetectLanguage || langOverride is AppSetting || langOverride is ForcedAuto -> {
-                val detected = context.detectLocaleFromText(currentText).firstOrNull()?.locale
-                detected?.let { voiceForLocale(it) } ?: DEFAULT_VOICE
+                // 1st: Unicode script counting — offline, 100% accurate for Indic scripts.
+                //      Many Indian sites declare lang="en" even for vernacular content, so
+                //      script detection is more reliable than the HTML lang attribute.
+                val scriptLang = detectLangFromScript(currentText)
+                if (scriptLang != null) {
+                    LANG_DEFAULT_VOICE[scriptLang] ?: DEFAULT_VOICE
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    // 2nd: Android TextClassifier — distinguishes Latin-script languages
+                    //      (English vs French vs Spanish etc.) where Unicode is ambiguous.
+                    context.detectLocaleFromText(currentText).firstOrNull()?.locale
+                        ?.let { voiceForLocale(it) } ?: DEFAULT_VOICE
+                } else {
+                    DEFAULT_VOICE
+                }
             }
+
             else -> DEFAULT_VOICE
         }
 
@@ -113,6 +129,27 @@ class EdgeTTSStateHolder(
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+    /**
+     * Count Unicode code points per Indic script in the first 500 chars.
+     * Each Indic script occupies a unique Unicode block, making this 100% accurate
+     * and fully offline — no API or model required.
+     * Returns the 2-letter BCP 47 language code (e.g. "ml", "hi") or null for Latin/other text.
+     *
+     * Ported from the readoutloud project's ReadabilityExtractor.detectScriptLang().
+     */
+    private fun detectLangFromScript(text: String): String? {
+        val sample = text.take(500)
+        val counts = mapOf(
+            "ml" to sample.count { it in '\u0D00'..'\u0D7F' },  // Malayalam
+            "hi" to sample.count { it in '\u0900'..'\u097F' },  // Devanagari (Hindi/Marathi)
+            "ta" to sample.count { it in '\u0B80'..'\u0BFF' },  // Tamil
+            "te" to sample.count { it in '\u0C00'..'\u0C7F' },  // Telugu
+            "kn" to sample.count { it in '\u0C80'..'\u0CFF' },  // Kannada
+        )
+        val best = counts.maxByOrNull { it.value } ?: return null
+        return if (best.value > 10) best.key else null
+    }
+
     private fun voiceForLocale(locale: Locale): String {
         val lang = locale.language    // e.g. "en", "ml"
         val region = locale.country   // e.g. "US", "IN"
@@ -125,6 +162,15 @@ class EdgeTTSStateHolder(
 
     companion object {
         private const val DEFAULT_VOICE = "en-US-MichelleNeural"
+
+        /** 2-letter lang code → best default voice (used by Unicode script detection path) */
+        private val LANG_DEFAULT_VOICE: Map<String, String> = mapOf(
+            "ml" to "ml-IN-SobhanaNeural",
+            "hi" to "hi-IN-SwaraNeural",
+            "ta" to "ta-IN-PallaviNeural",
+            "te" to "te-IN-ShrutiNeural",
+            "kn" to "kn-IN-SapnaNeural",
+        )
 
         /** Locale tag → default Edge TTS voice name */
         val EDGE_VOICE_MAP: LinkedHashMap<String, String> = linkedMapOf(
