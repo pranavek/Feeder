@@ -28,9 +28,7 @@ sealed class TtsEvent {
     data class EngineError(val message: String) : TtsEvent()
 }
 
-class EdgeTtsManager(context: Context) {
-
-    private val appContext = context.applicationContext
+class EdgeTtsManager(private val context: Context) {
     private val engine = EdgeTtsEngine()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -206,7 +204,7 @@ class EdgeTtsManager(context: Context) {
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private fun writeTempMp3(bytes: ByteArray): File {
-        val file = File(appContext.cacheDir, "edgetss_${System.nanoTime()}.mp3")
+        val file = File(context.cacheDir, "edgetss_${System.nanoTime()}.mp3")
         file.writeBytes(bytes)
         return file
     }
