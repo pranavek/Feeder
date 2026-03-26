@@ -36,6 +36,7 @@ import com.nononsenseapps.feeder.model.AlwaysUseCacheIfPossibleRequestsIntercept
 import com.nononsenseapps.feeder.model.ForceCacheOnSomeFailuresInterceptor
 import com.nononsenseapps.feeder.model.OneImageRequestPerHostInterceptor
 import com.nononsenseapps.feeder.model.RateLimitedInterceptor
+import com.nononsenseapps.feeder.edgetss.EdgeTTSStateHolder
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.TooManyRequestsInterceptor
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
@@ -68,7 +69,7 @@ class FeederApplication :
     DIAware,
     SingletonImageLoader.Factory {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
-    private val ttsStateHolder = TTSStateHolder(this, applicationCoroutineScope)
+    private val ttsStateHolder = EdgeTTSStateHolder(this, applicationCoroutineScope)
 
     override val di by DI.lazy {
         bind<FilePathProvider>() with

@@ -267,6 +267,17 @@ fun ArticleScreen(
                         }
                     }
 
+                    PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.read_article)) }) {
+                        IconButton(
+                            onClick = ttsOnPlay,
+                        ) {
+                            Icon(
+                                Icons.CustomFilled.TextToSpeech,
+                                contentDescription = stringResource(id = R.string.read_article),
+                            )
+                        }
+                    }
+
                     PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.open_menu)) }) {
                         Box {
                             IconButton(

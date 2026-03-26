@@ -29,7 +29,7 @@ import java.util.Locale
 /**
  * Any callers must call #shutdown when shutting down
  */
-class TTSStateHolder(
+open class TTSStateHolder(
     val context: Context,
     val coroutineScope: CoroutineScope,
 ) : TextToSpeech.OnInitListener {
@@ -83,14 +83,14 @@ class TTSStateHolder(
     private var useDetectLanguage: Boolean = true
 
     private val _ttsState = MutableStateFlow(PlaybackStatus.STOPPED)
-    val ttsState: StateFlow<PlaybackStatus> = _ttsState.asStateFlow()
+    open val ttsState: StateFlow<PlaybackStatus> = _ttsState.asStateFlow()
 
     @Suppress("ktlint:standard:property-naming")
     private val _language = MutableStateFlow<LocaleOverride>(AppSetting)
-    val language: StateFlow<LocaleOverride> = _language.asStateFlow()
+    open val language: StateFlow<LocaleOverride> = _language.asStateFlow()
 
     private val _availableLanguages = MutableStateFlow<List<Locale>>(emptyList())
-    val availableLanguages: StateFlow<List<Locale>> = _availableLanguages.asStateFlow()
+    open val availableLanguages: StateFlow<List<Locale>> = _availableLanguages.asStateFlow()
 
     private var allAvailableLanguages: Set<Locale> = emptySet()
 
@@ -141,7 +141,7 @@ class TTSStateHolder(
         }
     }
 
-    fun tts(
+    open fun tts(
         textArray: List<AnnotatedString>,
         useDetectLanguage: Boolean,
     ) {
@@ -156,7 +156,7 @@ class TTSStateHolder(
         play()
     }
 
-    fun play() {
+    open fun play() {
         startJob?.cancel()
         startJob =
             coroutineScope.launch {
@@ -202,13 +202,13 @@ class TTSStateHolder(
             }
     }
 
-    fun pause() {
+    open fun pause() {
         startJob?.cancel()
         textToSpeech?.stop()
         _ttsState.value = PlaybackStatus.PAUSED
     }
 
-    fun stop() {
+    open fun stop() {
         startJob?.cancel()
         textToSpeech?.stop()
         textToSpeechQueue.clear()
@@ -216,7 +216,7 @@ class TTSStateHolder(
         textToSpeech = null
     }
 
-    fun skipNext() {
+    open fun skipNext() {
         coroutineScope.launch {
             startJob?.cancel()
             textToSpeech?.stop()
@@ -229,7 +229,7 @@ class TTSStateHolder(
         }
     }
 
-    fun setLanguage(lang: LocaleOverride) {
+    open fun setLanguage(lang: LocaleOverride) {
         coroutineScope.launch {
             startJob?.cancel()
             textToSpeech?.stop()
@@ -304,7 +304,7 @@ class TTSStateHolder(
         }
     }
 
-    fun shutdown() {
+    open fun shutdown() {
         textToSpeech?.shutdown()
     }
 
